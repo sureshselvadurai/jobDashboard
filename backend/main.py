@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, date
 from typing import List
 
+import pandas as pd
 from fastapi import FastAPI, Depends, HTTPException
 from jobspy import scrape_jobs
 from sqlalchemy.orm import Session
@@ -81,12 +82,10 @@ def refresh_jobs(db: Session = Depends(get_db)):
                                hours_old=72,
                                country_indeed='USA')
 
-        import numpy as np  # Import NumPy to check for NaN values
-
         for job_data in new_jobs.to_dict(orient="records"):
             date_posted = job_data["date_posted"]
 
-            # ✅ Ensure `date_posted` is a `datetime`
+            # Ensure `date_posted` is a valid datetime
             if isinstance(date_posted, date):
                 parsed_date = datetime.combine(date_posted, datetime.min.time())
             elif isinstance(date_posted, str):
@@ -96,20 +95,21 @@ def refresh_jobs(db: Session = Depends(get_db)):
                     try:
                         parsed_date = datetime.strptime(date_posted, "%Y-%m-%d %H:%M:%S")
                     except ValueError:
-                        raise ValueError(f"Cannot parse date_posted: {date_posted}")
+                        parsed_date = datetime(2000, 1, 1)
             else:
-                raise ValueError(f"Unexpected date format: {date_posted} ({type(date_posted)})")
+                parsed_date = datetime(2000, 1, 1)
 
+            # ✅ Check for NaN values and replace them with "Unknown"
             job = JobListing(
-                site=job_data["site"],
-                job_url=job_data["job_url"],
-                title=job_data["title"],
-                company=job_data["company"],
-                location=job_data["location"],
+                site=job_data["site"] if pd.notna(job_data["site"]) else "Unknown",
+                job_url=job_data["job_url"] if pd.notna(job_data["job_url"]) else "Unknown",
+                title=job_data["title"] if pd.notna(job_data["title"]) else "Unknown",
+                company=job_data["company"] if pd.notna(job_data["company"]) else "Unknown",
+                location=job_data["location"] if pd.notna(job_data["location"]) else "Unknown",
                 date_posted=parsed_date,
-                description=str(job_data.get("description"))[:150],
+                description=str(job_data.get("description"))[:150] if job_data["description"] else "No description",
                 created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
+                updated_at=datetime.utcnow(),
             )
 
             db.add(job)

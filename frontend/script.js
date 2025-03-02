@@ -23,12 +23,11 @@ async function fetchJobs() {
     }
 }
 
-// Function to display jobs in the table
 function displayJobs(jobs) {
     jobsTableBody.innerHTML = "";
 
     if (jobs.length === 0) {
-        jobsTableBody.innerHTML = "<tr><td colspan='5'>No jobs found.</td></tr>";
+        jobsTableBody.innerHTML = "<tr><td colspan='6'>No jobs found.</td></tr>";
         return;
     }
 
@@ -39,6 +38,7 @@ function displayJobs(jobs) {
             <td>${job.company}</td>
             <td>${job.location}</td>
             <td>${job.date_posted}</td>
+            <td><a href="${job.job_url}" target="_blank">View Job</a></td>
             <td>
                 <button onclick="markAsApplied(${job.id})">
                     ${job.applied ? "✅ Applied" : "📝 Apply"}
