@@ -22,17 +22,11 @@ class JobListing(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-# DB_USER = os.getenv("DB_USER", "root")
-# DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
-# DB_HOST = os.getenv("DB_HOST", "localhost")
-# DB_PORT = os.getenv("DB_PORT", "3306")
-# DB_NAME = os.getenv("DB_NAME", "job_database")
-
-DB_USER = os.getenv("DB_USER", "admin")  # Replace with your actual DB user
-DB_PASSWORD = os.getenv("DB_PASSWORD", "Sureshraja5*")  # Replace with your actual DB password
-DB_HOST = os.getenv("DB_HOST", "database-1.cgf47yzycfda.us-east-1.rds.amazonaws.com")
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
+DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = os.getenv("DB_PORT", "3306")
-DB_NAME = os.getenv("DB_NAME", "database-1")  # Replace with your actual DB name
+DB_NAME = os.getenv("DB_NAME", "job_database")
 
 db_url = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(db_url)
