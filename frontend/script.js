@@ -1,12 +1,12 @@
-// API URL - Use localhost when running outside Docker
 const API_URL = window.location.hostname === "localhost"
     ? "http://localhost:8000/jobs/"
     : "http://127.0.0.1:8000/jobs/";
 
 const jobsTableBody = document.getElementById("jobs-table-body");
+const searchInput = document.getElementById("search-input");
 
 // Initial state for filters
-let filters = { applied: null, favourite: null };
+let filters = { applied: null, favourite: null, search: "" };
 
 // Function to fetch jobs with filters
 async function fetchJobs() {
@@ -14,6 +14,7 @@ async function fetchJobs() {
         const params = new URLSearchParams();
         if (filters.applied !== null) params.append("applied", filters.applied);
         if (filters.favourite !== null) params.append("favourite", filters.favourite);
+        if (filters.search) params.append("search", filters.search);
 
         const response = await fetch(`${API_URL}?${params}`);
         const jobs = await response.json();
@@ -84,6 +85,19 @@ document.getElementById("filter-favourite").addEventListener("click", () => {
 });
 
 document.getElementById("refresh-jobs").addEventListener("click", fetchJobs);
+
+// ✅ Search Functionality
+document.getElementById("search-button").addEventListener("click", () => {
+    filters.search = searchInput.value.trim();
+    fetchJobs();
+});
+
+searchInput.addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+        filters.search = searchInput.value.trim();
+        fetchJobs();
+    }
+});
 
 // Fetch jobs when the page loads
 fetchJobs();

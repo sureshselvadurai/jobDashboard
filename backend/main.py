@@ -21,15 +21,27 @@ app.add_middleware(
 )
 
 
+from sqlalchemy import or_
+
 @app.get("/jobs/", response_model=List[JobListingResponse])
-def get_jobs(applied: bool = None, favourite: bool = None, db: Session = Depends(get_db)):
+def get_jobs(
+    applied: bool = None,
+    favourite: bool = None,
+    search: str = None,  # New search filter
+    db: Session = Depends(get_db),
+):
     query = db.query(JobListing)
-    print(f"Query: {query}")
 
     if applied is not None:
         query = query.filter(JobListing.applied == applied)
     if favourite is not None:
         query = query.filter(JobListing.favourite == favourite)
+    if search:
+        query = query.filter(
+            or_(
+                JobListing.title.ilike(f"%{search}%")
+            )
+        )
 
     return query.order_by(JobListing.date_posted.desc()).limit(100).all()
 
@@ -107,6 +119,8 @@ def refresh_jobs(db: Session = Depends(get_db)):
                 company=job_data["company"] if pd.notna(job_data["company"]) else "Unknown",
                 location=job_data["location"] if pd.notna(job_data["location"]) else "Unknown",
                 date_posted=parsed_date,
+                applied=False,
+                favourite=False,
                 description=str(job_data.get("description"))[:150] if job_data["description"] else "No description",
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow(),
