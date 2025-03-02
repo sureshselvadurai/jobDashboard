@@ -1,0 +1,149 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 90%;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.table-container {
+    overflow-x: auto;
+    max-width: 100%;
+    margin: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+}
+
+td {
+    font-size: 14px;
+}
+
+.action-btn {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 2px;
+}
+
+.apply-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.apply-btn.disabled {
+    background-color: #888;
+    cursor: not-allowed;
+}
+
+.favourite-btn {
+    background-color: #ffcc00;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination button {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#page-info {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Different styles for filters */
+.filters button {
+    background-color: #28a745;
+}
+
+.filters button:hover {
+    background-color: #218838;
+}

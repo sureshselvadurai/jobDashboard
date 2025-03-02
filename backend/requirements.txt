@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+playwright
+alembic
+python-dotenv
+requests
+pymysql
+cryptography
+git+https://github.com/cullenwatson/JobSpy.git

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Job Dashboard</h1>
+
+        <!-- Filter Buttons -->
+        <div class="filters">
+            <button id="filter-applied">Show Applied</button>
+            <button id="filter-favourite">Show Favourites</button>
+            <button id="refresh-jobs">Refresh Jobs</button>
+        </div>
+
+        <!-- Job Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Company</th>
+                        <th>Location</th>
+                        <th>Date Posted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="jobs-table-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button id="prev-page">« Prev</button>
+            <span id="page-info"></span>
+            <button id="next-page">Next »</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
