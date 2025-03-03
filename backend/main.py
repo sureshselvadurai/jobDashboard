@@ -100,7 +100,12 @@ def refresh_jobs(db: Session = Depends(get_db)):
 
         for job_data in new_jobs.to_dict(orient="records"):
             date_posted = job_data["date_posted"]
+            job_url = job_data.get("job_url")
 
+            existing_job = db.query(JobListing).filter(JobListing.job_url == job_url).first()
+
+            if existing_job:
+                continue
             # Ensure `date_posted` is a valid datetime
             if isinstance(date_posted, date):
                 parsed_date = datetime.combine(date_posted, datetime.min.time())
