@@ -79,6 +79,10 @@ def mark_job_favourite(job_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Job favourite status updated"}
 
+@app.get("/")
+def mark_job_favourite():
+    return {"message": "API Application is live"}
+
 
 @app.get("/jobs/refresh/")
 def refresh_jobs(db: Session = Depends(get_db)):

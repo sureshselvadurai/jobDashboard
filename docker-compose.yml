@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: job_database
+      MYSQL_DATABASE: jobs
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
@@ -35,7 +35,7 @@ services:
       DB_PASSWORD: password
       DB_HOST: db
       DB_PORT: 3306
-      DB_NAME: job_database
+      DB_NAME: jobs
     ports:
       - "8000:8000"
     volumes:
