@@ -1,6 +1,6 @@
 const API_URL = window.location.hostname === "localhost"
     ? "http://localhost:8000/jobs/"
-    : "https://api.sureshraja.live/jobs";
+    : "https://api.sureshraja.live/jobs/";
 
 const jobsTableBody = document.getElementById("jobs-table-body");
 const searchInput = document.getElementById("search-input");

@@ -10,7 +10,7 @@ from starlette.middleware.cors import CORSMiddleware
 from database import JobListing, get_db
 from models import JobListingResponse
 
-app = FastAPI()
+app = FastAPI(redirect_slashes=False)
 
 app.add_middleware(
     CORSMiddleware,
