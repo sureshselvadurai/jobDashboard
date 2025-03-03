@@ -2,13 +2,14 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, Float, create
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
-from confg import Config
+from conf import Config
 import os
 
 Base = declarative_base()
 
 class JobListing(Base):
     __tablename__ = "job_listings"
+    __table_args__ = {"schema": "jobs"}  # Specify database/schema name
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     site = Column(String(255), nullable=True)
