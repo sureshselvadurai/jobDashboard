@@ -54,5 +54,18 @@ services:
     volumes:
       - ./frontend:/app
 
+  notifier:
+    build:
+      context: ./notifier
+      dockerfile: Dockerfile
+    container_name: job_notifier
+    restart: always
+    ports:
+      - "8500:8500"
+    environment:
+      SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
+    volumes:
+      - ./notifier:/app
+
 volumes:
   mysql_data:

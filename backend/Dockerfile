@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir --upgrade pip
 COPY requirements.txt /app/requirements.txt
 
 # Install dependencies globally
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Ensure `uvicorn` is installed in case it's missing
 RUN pip install --no-cache-dir uvicorn
@@ -30,4 +30,4 @@ COPY . .
 EXPOSE 8000
 
 # Start FastAPI using global Python installation
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "localhost", "--port", "8000", "--reload"]
