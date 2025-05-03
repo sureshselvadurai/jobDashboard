@@ -190,7 +190,7 @@ def refresh_jobs(db: Session = Depends(get_db)):
             logger.error(f"❌ Exception while sending Slack message: {e}")
             return JSONResponse(status_code=500, content={"error": str(e)})
 
-        return {"message": "Jobs refreshed and Slack notified", "jobs_sent": len(res)}
+        return {"message": "Jobs refreshed and Slack notified", "jobs_sent": f"{res}"}
 
     return {"message": "Recent jobs already exist"}
 
@@ -235,4 +235,4 @@ def refresh_and_notify(db: Session = Depends(get_db)):
         logger.error(f"❌ Exception while sending Slack message: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-    return {"message": "Jobs refreshed and Slack notified", "jobs_sent": len(top_jobs)}
+    return {"message": "Jobs refreshed and Slack notified", "jobs_sent": f"{res}"}

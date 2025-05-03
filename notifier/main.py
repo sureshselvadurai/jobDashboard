@@ -1,10 +1,14 @@
+import logging
+
 from fastapi import FastAPI, Request
 import os
-from slack_sdk.webhook import WebhookClient
 import requests
 
 app = FastAPI()
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 @app.get("/health")
 def health():
@@ -17,12 +21,8 @@ async def post_to_slack(request: Request):
 
     if not text:
         return {"error": "Missing message text"}
+    logger.info(f"SLACK_WEBHOOK_URL: {SLACK_WEBHOOK_URL}")
 
-    webhook = WebhookClient(SLACK_WEBHOOK_URL)
 
-    webhook.send(
-        text=(
-            f"{text}"
-        )
-    )
-    return {"status": SLACK_WEBHOOK_URL}
+    response = requests.post(SLACK_WEBHOOK_URL, json={"text": text})
+    return {"status": response.status_code}

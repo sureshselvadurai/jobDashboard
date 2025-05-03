@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies
-RUN pip install --no-cache-dir fastapi uvicorn requests slack_sdk
+RUN pip install --no-cache-dir fastapi uvicorn requests
 
 # Expose the notifier port
 EXPOSE 8500

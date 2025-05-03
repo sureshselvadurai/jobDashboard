@@ -63,7 +63,7 @@ services:
     ports:
       - "8500:8500"
     environment:
-      SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
+      SLACK_WEBHOOK_URL: "*****"
     volumes:
       - ./notifier:/app
     healthcheck:
