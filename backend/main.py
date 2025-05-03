@@ -107,6 +107,8 @@ def mark_job_favourite():
 
 @app.get("/jobs/refresh/")
 def refresh_jobs(db: Session = Depends(get_db)):
+
+    return{"status": "Testing here"}
     last_24_hours = datetime.utcnow() - timedelta(hours=24)
     recent_jobs = db.query(JobListing).filter(JobListing.created_at >= last_24_hours).count()
     search_list = ["software engineer","machine learning"]
@@ -166,7 +168,7 @@ def refresh_jobs(db: Session = Depends(get_db)):
     return {"message": "Recent jobs already exist"}
 
 
-@app.get("/notify/refresh-and-notify/")
+@app.get("/notify/refresh-and-notify")
 def refresh_and_notify(db: Session = Depends(get_db)):
     logger.info("🔄 Called /notify/refresh-and-notify/")
     return{"status": "Testing"}
