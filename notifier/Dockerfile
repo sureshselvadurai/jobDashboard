@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir fastapi uvicorn requests
 EXPOSE 8500
 
 # Start the notifier service
-CMD ["uvicorn", "main:app", "--host", "localhost", "--port", "8500"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8500"]

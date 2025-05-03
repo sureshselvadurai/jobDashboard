@@ -66,18 +66,12 @@ services:
       SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
     volumes:
       - ./notifier:/app
-
-  health-checker:
-    image: python:3.10
-    container_name: job_health_checker
-    restart: always
-    depends_on:
-      - backend
-      - notifier
-    volumes:
-      - ./health-checker:/app
-    working_dir: /app
-    command: ["python", "check_health.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8500/health"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
 
 volumes:
   mysql_data:

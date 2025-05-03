@@ -5,6 +5,10 @@ import requests
 app = FastAPI()
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 @app.post("/notify")
 async def post_to_slack(request: Request):
     body = await request.json()
