@@ -150,7 +150,7 @@ def refresh_jobs(db: Session = Depends(get_db)):
     return {"message": "Recent jobs already exist"}
 
 
-@app.get("/jobs/refresh-and-notify/")
+@app.get("/notify/refresh-and-notify/")
 def refresh_and_notify(db: Session = Depends(get_db)):
     from fastapi.responses import JSONResponse
 
