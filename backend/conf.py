@@ -10,3 +10,4 @@ class Config:
     DB_HOST = os.getenv("DB_HOST", "localhost")
     DB_PORT = os.getenv("DB_PORT", "3306")
     DB_NAME = os.getenv("DB_NAME", "jobs")
+    NOTIFIER_URL = os.getenv("NOTIFIER_URL", "http://localhost:8500/notify")

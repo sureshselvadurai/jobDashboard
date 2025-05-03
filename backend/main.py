@@ -14,11 +14,9 @@ from starlette.middleware.cors import CORSMiddleware
 
 from database import JobListing, get_db
 from models import JobListingResponse
-
+from conf import Config
 import os
 import requests
-
-NOTIFIER_URL = os.getenv("NOTIFIER_URL", "http://notifier:8500/notify")
 
 app = FastAPI(redirect_slashes=False)
 
@@ -37,6 +35,9 @@ from sqlalchemy import or_
 def health_check():
     return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
 
+@app.get("/routes")
+def list_routes():
+    return [route.path for route in app.routes]
 
 @app.get("/jobs/", response_model=List[JobListingResponse])
 def get_jobs(
@@ -181,7 +182,7 @@ def refresh_and_notify(db: Session = Depends(get_db)):
 
     # 4. Send to notifier
     try:
-        res = requests.post(NOTIFIER_URL, json={"text": message})
+        res = requests.post(Config.NOTIFIER_URL, json={"text": message})
         if res.status_code != 200:
             return JSONResponse(status_code=500, content={"error": "Slack webhook failed"})
     except Exception as e:
