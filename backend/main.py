@@ -112,6 +112,39 @@ def refresh_jobs(db: Session = Depends(get_db)):
     recent_jobs = db.query(JobListing).filter(JobListing.created_at >= last_24_hours).count()
     search_list = ["software engineer","machine learning"]
 
+    refresh_jobs_db(db, recent_jobs, search_list)
+
+    try:
+        jobs = get_jobs(db=db)
+        top_jobs = jobs[:10]
+        logger.info(f"📋 Retrieved {len(top_jobs)} jobs")
+    except Exception as e:
+        logger.error(f"❌ Failed to fetch jobs: {e}")
+        return JSONResponse(status_code=500, content={"error": "Failed to fetch jobs"})
+
+    # 3. Format Slack message
+    message = "*🆕 Top 10 Latest Jobs*\n"
+    if not top_jobs:
+        message += "No jobs available."
+    else:
+        for idx, job in enumerate(top_jobs, 1):
+            message += f"\n{idx}. *{job.title}* at *{job.company}*\n<{job.job_url}|View Job>"
+
+    # 4. Send to notifier
+    try:
+        logger.info(f"📨 Sending Slack message to {Config.NOTIFIER_URL}")
+        res = requests.post(Config.NOTIFIER_URL, json={"text": message})
+        if res.status_code != 200:
+            logger.error(f"❌ Slack response: {res.status_code}, {res.text}")
+            return JSONResponse(status_code=500, content={"error": "Slack webhook failed"})
+    except Exception as e:
+        logger.error(f"❌ Exception while sending Slack message: {e}")
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+    return {"message": "Jobs refreshed and Slack notified", "jobs_sent": len(top_jobs)}
+
+
+def refresh_jobs_db(db, recent_jobs, search_list):
     for search_term in search_list:
         if recent_jobs == 0:
             new_jobs = scrape_jobs(site_name=["linkedin"],
@@ -162,31 +195,3 @@ def refresh_jobs(db: Session = Depends(get_db)):
                 db.add(job)
 
             db.commit()
-    try:
-        jobs = get_jobs(db=db)
-        top_jobs = jobs[:10]
-        logger.info(f"📋 Retrieved {len(top_jobs)} jobs")
-    except Exception as e:
-        logger.error(f"❌ Failed to fetch jobs: {e}")
-        return JSONResponse(status_code=500, content={"error": "Failed to fetch jobs"})
-
-    # 3. Format Slack message
-    message = "*🆕 Top 10 Latest Jobs*\n"
-    if not top_jobs:
-        message += "No jobs available."
-    else:
-        for idx, job in enumerate(top_jobs, 1):
-            message += f"\n{idx}. *{job.title}* at *{job.company}*\n<{job.job_url}|View Job>"
-
-    # 4. Send to notifier
-    try:
-        logger.info(f"📨 Sending Slack message to {Config.NOTIFIER_URL}")
-        res = requests.post(Config.NOTIFIER_URL, json={"text": message})
-        if res.status_code != 200:
-            logger.error(f"❌ Slack response: {res.status_code}, {res.text}")
-            return JSONResponse(status_code=500, content={"error": "Slack webhook failed"})
-    except Exception as e:
-        logger.error(f"❌ Exception while sending Slack message: {e}")
-        return JSONResponse(status_code=500, content={"error": str(e)})
-
-    return {"message": "Jobs refreshed and Slack notified", "jobs_sent": len(top_jobs)}
