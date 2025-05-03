@@ -25,4 +25,4 @@ async def post_to_slack(request: Request):
 
 
     response = requests.post(SLACK_WEBHOOK_URL, json={"text": text})
-    return {"status": response.status_code}
+    return {"status": response}
