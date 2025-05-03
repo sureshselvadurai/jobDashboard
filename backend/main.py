@@ -108,7 +108,6 @@ def mark_job_favourite():
 @app.get("/jobs/refresh/")
 def refresh_jobs(db: Session = Depends(get_db)):
 
-    return{"status": "Testing here"}
     last_24_hours = datetime.utcnow() - timedelta(hours=24)
     recent_jobs = db.query(JobListing).filter(JobListing.created_at >= last_24_hours).count()
     search_list = ["software engineer","machine learning"]
@@ -163,25 +162,6 @@ def refresh_jobs(db: Session = Depends(get_db)):
                 db.add(job)
 
             db.commit()
-        return {"message": "New jobs fetched and stored"}
-
-    return {"message": "Recent jobs already exist"}
-
-
-@app.get("/notify/refresh-and-notify")
-def refresh_and_notify(db: Session = Depends(get_db)):
-    logger.info("🔄 Called /notify/refresh-and-notify/")
-    return{"status": "Testing"}
-
-    # 1. Refresh jobs
-    try:
-        logger.info("🔁 Refreshing jobs")
-        refresh_jobs(db)
-    except Exception as e:
-        logger.error(f"❌ Failed to refresh jobs: {e}")
-        return JSONResponse(status_code=500, content={"error": "Failed to refresh jobs"})
-
-    # 2. Get latest 10 jobs
     try:
         jobs = get_jobs(db=db)
         top_jobs = jobs[:10]
