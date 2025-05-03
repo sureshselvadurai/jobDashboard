@@ -169,6 +169,7 @@ def refresh_jobs(db: Session = Depends(get_db)):
 @app.get("/notify/refresh-and-notify/")
 def refresh_and_notify(db: Session = Depends(get_db)):
     logger.info("🔄 Called /notify/refresh-and-notify/")
+    return{"status": "Testing"}
 
     # 1. Refresh jobs
     try:
