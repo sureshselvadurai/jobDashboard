@@ -67,5 +67,17 @@ services:
     volumes:
       - ./notifier:/app
 
+  health-checker:
+    image: python:3.10
+    container_name: job_health_checker
+    restart: always
+    depends_on:
+      - backend
+      - notifier
+    volumes:
+      - ./health-checker:/app
+    working_dir: /app
+    command: ["python", "check_health.py"]
+
 volumes:
   mysql_data:

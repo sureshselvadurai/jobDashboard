@@ -1,7 +1,12 @@
+import os
+import threading
+import time
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, date
 from typing import List
 
 import pandas as pd
+import requests
 from fastapi import FastAPI, Depends, HTTPException
 from jobspy import scrape_jobs
 from sqlalchemy.orm import Session
@@ -27,6 +32,11 @@ app.add_middleware(
 
 
 from sqlalchemy import or_
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
+
 
 @app.get("/jobs/", response_model=List[JobListingResponse])
 def get_jobs(
