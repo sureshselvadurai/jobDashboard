@@ -17,6 +17,11 @@ from models import JobListingResponse
 from conf import Config
 import os
 import requests
+import logging
+from fastapi.responses import JSONResponse
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(redirect_slashes=False)
 
@@ -163,14 +168,24 @@ def refresh_jobs(db: Session = Depends(get_db)):
 
 @app.get("/notify/refresh-and-notify/")
 def refresh_and_notify(db: Session = Depends(get_db)):
-    from fastapi.responses import JSONResponse
+    logger.info("🔄 Called /notify/refresh-and-notify/")
 
     # 1. Refresh jobs
-    refresh_jobs(db)
+    try:
+        logger.info("🔁 Refreshing jobs")
+        refresh_jobs(db)
+    except Exception as e:
+        logger.error(f"❌ Failed to refresh jobs: {e}")
+        return JSONResponse(status_code=500, content={"error": "Failed to refresh jobs"})
 
     # 2. Get latest 10 jobs
-    jobs = get_jobs(db=db)
-    top_jobs = jobs[:10]
+    try:
+        jobs = get_jobs(db=db)
+        top_jobs = jobs[:10]
+        logger.info(f"📋 Retrieved {len(top_jobs)} jobs")
+    except Exception as e:
+        logger.error(f"❌ Failed to fetch jobs: {e}")
+        return JSONResponse(status_code=500, content={"error": "Failed to fetch jobs"})
 
     # 3. Format Slack message
     message = "*🆕 Top 10 Latest Jobs*\n"
@@ -182,10 +197,13 @@ def refresh_and_notify(db: Session = Depends(get_db)):
 
     # 4. Send to notifier
     try:
+        logger.info(f"📨 Sending Slack message to {Config.NOTIFIER_URL}")
         res = requests.post(Config.NOTIFIER_URL, json={"text": message})
         if res.status_code != 200:
+            logger.error(f"❌ Slack response: {res.status_code}, {res.text}")
             return JSONResponse(status_code=500, content={"error": "Slack webhook failed"})
     except Exception as e:
+        logger.error(f"❌ Exception while sending Slack message: {e}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
     return {"message": "Jobs refreshed and Slack notified", "jobs_sent": len(top_jobs)}
