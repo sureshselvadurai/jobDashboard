@@ -31,7 +31,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{ env.REGION }}
+          aws-region: us-east-1
 
       - name: 🔑 Login to ECR
         run: |
@@ -68,7 +68,7 @@ jobs:
         run: |
           for i in {1..10}; do
             echo "Attempt $i: checking backend..."
-            if docker exec job_backend curl -s http://0.0.0.0:8000 -o /tmp/result.json; then
+            if docker exec job_backend curl -s http://0.0.0.0:8000/ -o /tmp/result.json; then
               echo "✅ Backend responded."
               docker exec job_backend cat /tmp/result.json
               exit 0
