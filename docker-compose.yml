@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: jobs
+      MYSQL_DATABASE: jdatabase
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
@@ -61,7 +61,7 @@ services:
     volumes:
       - ./notifier:/app
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8500/health"]
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:8500/health"]
       interval: 10s
       retries: 5
       start_period: 10s
