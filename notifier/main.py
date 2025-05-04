@@ -36,5 +36,6 @@ async def post_to_slack(request: Request):
         return {"status": "sent"}
 
     except Exception as e:
+
         logger.exception("Failed to send message to Slack")
         return {"error": str(e)}

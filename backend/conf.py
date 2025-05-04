@@ -18,5 +18,6 @@ print("🔧 Loaded DB Config:")
 print(f"  Host: {Config.DB_HOST}")
 print(f"  Port: {Config.DB_PORT}")
 print(f"  User: {Config.DB_USER}")
+
 print(f"  Name: {Config.DB_NAME}")
 print(f"  Notifier URL: {Config.NOTIFIER_URL}")
