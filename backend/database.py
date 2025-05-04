@@ -64,9 +64,15 @@ def wait_for_db(engine, retries=10, delay=3):
             time.sleep(delay)
     raise RuntimeError("❌ Database not ready after retries.")
 
+def ensure_schema_exists():
+    print("🔧 Ensuring 'jobs' schema exists...")
+    with engine.connect() as conn:
+        conn.execute("CREATE SCHEMA IF NOT EXISTS jobs;")
+
 def init_db():
     print("🛠️ Initializing DB...")
     wait_for_db(engine)
+    ensure_schema_exists()
     Base.metadata.create_all(bind=engine)
     print("✅ Tables created (if not exist).")
 
