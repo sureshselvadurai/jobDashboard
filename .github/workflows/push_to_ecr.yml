@@ -66,8 +66,20 @@ jobs:
 
       - name: 🔍 Call /notify/refresh-and-notify
         run: |
-          docker exec job_backend curl http://localhost:8000/notify/refresh-and-notify -o /tmp/result.json
-          docker exec job_backend cat /tmp/result.json
+          for i in {1..10}; do
+            echo "Attempt $i: checking backend..."
+            if docker exec job_backend curl -s http://localhost:8000/notify/refresh-and-notify -o /tmp/result.json; then
+              echo "✅ Backend responded."
+              docker exec job_backend cat /tmp/result.json
+              exit 0
+            else
+              echo "❌ Backend not ready, retrying in 3s..."
+              sleep 3
+            fi
+          done
+          echo "❌ Backend never responded after retries."
+          exit 1
+
 
       - name: 🚀 Build & Push Backend Image
         if: env.CHANGED_BACKEND != ''
