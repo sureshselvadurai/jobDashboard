@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI, Request
 import os
 import requests
+from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
