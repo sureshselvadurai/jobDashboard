@@ -16,6 +16,7 @@ class Config:
     FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://frontend:5500/notify"
 
 print("🔧 Loaded DB Config:")
+
 print(f"  Host: {Config.DB_HOST}")
 print(f"  Port: {Config.DB_PORT}")
 print(f"  User: {Config.DB_USER}")
