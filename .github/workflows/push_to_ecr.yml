@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: ✅ Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # Needed for diffing with previous commit
 
       - name: 🔐 Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -29,7 +31,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{ env.REGION }}
+          aws-region: us-east-1
 
       - name: 🔑 Login to ECR
         run: |
@@ -42,17 +44,45 @@ jobs:
           SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }}
           EOF
 
-      - name: 🐳 Start Docker-Compose
+      - name: 🕵️ Detect Changed Services
+        id: changes
+        shell: bash
+        run: |
+          git diff --name-only HEAD^ HEAD > changed.txt
+
+          if grep -q '^backend/' changed.txt; then
+            echo "CHANGED_BACKEND=true" >> "$GITHUB_ENV"
+          fi
+          if grep -q '^frontend/' changed.txt; then
+            echo "CHANGED_FRONTEND=true" >> "$GITHUB_ENV"
+          fi
+          if grep -q '^notifier/' changed.txt; then
+            echo "CHANGED_NOTIFIER=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: 🐳 Start Docker Compose
         run: |
           docker compose --env-file .env up -d
           sleep 30
 
-      - name: 🔍 Call /notify/refresh-and-notify
+      - name: 🔍 Call refresh-notify-api
         run: |
-          docker exec job_backend curl http://localhost:8000/notify/refresh-and-notify -o /tmp/result.json
-          docker exec job_backend cat /tmp/result.json
+          for i in {1..10}; do
+            echo "Attempt $i: checking backend..."
+            if docker exec job_backend curl -s http://0.0.0.0:8000/notify/refresh-and-notify -o /tmp/result.json; then
+              echo "✅ Backend responded."
+              docker exec job_backend cat /tmp/result.json
+              exit 0
+            else
+              echo "❌ Backend not ready, retrying in 3s..."
+              sleep 3
+            fi
+          done
+          echo "❌ Backend never responded after retries."
+          exit 1
 
       - name: 🚀 Build & Push Backend Image
+        if: env.CHANGED_BACKEND == 'true'
         run: |
           docker build \
             --build-arg DB_USER=${{ secrets.DB_USER }} \
@@ -64,11 +94,13 @@ jobs:
           docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:latest
 
       - name: 🚀 Build & Push Frontend Image
+        if: env.CHANGED_FRONTEND == 'true'
         run: |
           docker build -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-frontend:latest frontend
           docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-frontend:latest
 
       - name: 🚀 Build & Push Notifier Image
+        if: env.CHANGED_NOTIFIER == 'true'
         run: |
           docker build \
             --build-arg SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }} \

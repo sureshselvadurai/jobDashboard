@@ -177,3 +177,21 @@ button:hover {
 #search-button:hover {
     background-color: #0056b3;
 }
+.health-indicators {
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.health-dot {
+  display: inline-block;
+  margin-right: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: beep 1s infinite;
+}
+
+@keyframes beep {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+      window.env = {
+        BACKEND_URL: "__BACKEND_URL__",
+        NOTIFIER_URL: "__NOTIFIER_URL__"
+      };
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <h1>Job Dashboard</h1>
+        <!-- Health Indicators -->
+        <div class="health-indicators">
+          <span id="backend-dot" class="health-dot"></span> Backend
+          <span id="notifier-dot" class="health-dot"></span> Notifier
+        </div>
+
 
         <!-- Search Bar -->
         <div class="search-container">
@@ -21,6 +34,7 @@
             <button id="filter-applied">Show Applied</button>
             <button id="filter-favourite">Show Favourites</button>
             <button id="refresh-jobs">Refresh Jobs</button>
+            <button id="notify-slack">Notify Slack 🔔</button>
         </div>
 
         <!-- Job Table -->

@@ -10,6 +10,12 @@ COPY . /app
 # Install dependencies
 RUN pip install --no-cache-dir fastapi uvicorn requests
 
+# Accept build-time arguments
+ARG SLACK_WEBHOOK_URL
+
+# Promote them to runtime environment variables
+ENV SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+
 # Expose the notifier port
 EXPOSE 8500
 
