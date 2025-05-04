@@ -7,6 +7,7 @@ load_dotenv()
 class Config:
     DB_USER = os.getenv("DB_USER") or "user"
     DB_PASSWORD = os.getenv("DB_PASSWORD") or "password"
+
     DB_HOST = os.getenv("DB_HOST") or "db"
     DB_PORT = int(os.getenv("DB_PORT") or 3306)
     DB_NAME = os.getenv("DB_NAME") or "jdatabase"

@@ -17,6 +17,7 @@ def health():
 
 @app.post("/notify")
 async def post_to_slack(request: Request):
+
     try:
         body = await request.json()
         text = body.get("text", "")

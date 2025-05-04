@@ -117,7 +117,7 @@ async function pingHealthEndpoints() {
   }
 
   try {
-    const notifierRes = await fetch(`${BACKEND_HEALTH_URL}/health`);
+    const notifierRes = await fetch(`${NOTIFIER_HEALTH_URL}/health`);
     const notifierStatus = await notifierRes.json();
     updateHealthDot("notifier-dot", notifierStatus.color);
   } catch {
