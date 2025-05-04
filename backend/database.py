@@ -41,7 +41,7 @@ try:
         user=Config.DB_USER,
         password=Config.DB_PASSWORD,
         database=Config.DB_NAME,
-        port=int(Config.DB_PORT),
+        port=Config.DB_PORT,
         connect_timeout=5
     )
     print("✅ Raw pymysql connection succeeded.")
