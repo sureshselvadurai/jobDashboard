@@ -5,7 +5,7 @@ import os
 import requests
 
 app = FastAPI()
-SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
+SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "https://hooks.slack.com/services/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")
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
