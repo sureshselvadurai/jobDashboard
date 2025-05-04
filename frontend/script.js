@@ -9,7 +9,7 @@ const searchInput = document.getElementById("search-input");
 let filters = { applied: null, favourite: null, search: "" };
 
 // Function to fetch jobs with filters
-async function fetchJobs() {
+async function  fetchJobs() {
     try {
         const params = new URLSearchParams();
         if (filters.applied !== null) params.append("applied", filters.applied);

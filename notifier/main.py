@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO)
 def health():
     return {"status": "ok"}
 
+
 @app.post("/notify")
 async def post_to_slack(request: Request):
     try:
