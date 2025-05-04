@@ -50,21 +50,22 @@ jobs:
         run: |
           git diff --name-only HEAD^ HEAD > changed.txt
 
-          CHANGED_BACKEND=$(grep '^backend/' changed.txt || true)
-          CHANGED_FRONTEND=$(grep '^frontend/' changed.txt || true)
-          CHANGED_NOTIFIER=$(grep '^notifier/' changed.txt || true)
-
-          # Export as environment variables for later steps
-          echo "CHANGED_BACKEND=${CHANGED_BACKEND}" >> "$GITHUB_ENV"
-          echo "CHANGED_FRONTEND=${CHANGED_FRONTEND}" >> "$GITHUB_ENV"
-          echo "CHANGED_NOTIFIER=${CHANGED_NOTIFIER}" >> "$GITHUB_ENV"
+          if grep -q '^backend/' changed.txt; then
+            echo "CHANGED_BACKEND=true" >> "$GITHUB_ENV"
+          fi
+          if grep -q '^frontend/' changed.txt; then
+            echo "CHANGED_FRONTEND=true" >> "$GITHUB_ENV"
+          fi
+          if grep -q '^notifier/' changed.txt; then
+            echo "CHANGED_NOTIFIER=true" >> "$GITHUB_ENV"
+          fi
 
       - name: 🐳 Start Docker Compose
         run: |
           docker compose --env-file .env up -d
           sleep 30
 
-      - name: 🔍 Call lh
+      - name: 🔍 Call refresh-notify-api
         run: |
           for i in {1..10}; do
             echo "Attempt $i: checking backend..."
@@ -80,9 +81,8 @@ jobs:
           echo "❌ Backend never responded after retries."
           exit 1
 
-
       - name: 🚀 Build & Push Backend Image
-        if: env.CHANGED_BACKEND != ''
+        if: env.CHANGED_BACKEND == 'true'
         run: |
           docker build \
             --build-arg DB_USER=${{ secrets.DB_USER }} \
@@ -94,13 +94,13 @@ jobs:
           docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:latest
 
       - name: 🚀 Build & Push Frontend Image
-        if: env.CHANGED_FRONTEND != ''
+        if: env.CHANGED_FRONTEND == 'true'
         run: |
           docker build -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-frontend:latest frontend
           docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-frontend:latest
 
       - name: 🚀 Build & Push Notifier Image
-        if: env.CHANGED_NOTIFIER != ''
+        if: env.CHANGED_NOTIFIER == 'true'
         run: |
           docker build \
             --build-arg SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }} \
