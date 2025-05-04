@@ -64,7 +64,7 @@ jobs:
           docker compose --env-file .env up -d
           sleep 30
 
-      - name: 🔍 Call /notify/refresh-and-notify
+      - name: 🔍 Call lh
         run: |
           for i in {1..10}; do
             echo "Attempt $i: checking backend..."
