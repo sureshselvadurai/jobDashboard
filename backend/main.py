@@ -19,6 +19,7 @@ logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(redirect_slashes=False)
 origins = [
+    "http://dev.app.sureshraja.live",
     Config.FRONTEND_URL,
     "http://localhost:5500",
     "http://127.0.0.1:5500",
@@ -27,7 +28,7 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
