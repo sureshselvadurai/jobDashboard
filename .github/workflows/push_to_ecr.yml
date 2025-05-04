@@ -42,7 +42,7 @@ jobs:
           SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }}
           EOF
 
-      - name: 🐳 Start Docker Compose
+      - name: 🐳 Start Docker-Compose
         run: |
           docker compose --env-file .env up -d
           sleep 30
