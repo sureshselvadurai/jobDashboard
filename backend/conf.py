@@ -9,6 +9,6 @@ class Config:
     DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
     DB_HOST = os.getenv("DB_HOST", "db")
     DB_PORT = os.getenv("DB_PORT", "3306")
-    DB_NAME = os.getenv("DB_NAME", "jobs")
+    DB_NAME = os.getenv("DB_NAME", "jdatabase")
 
     NOTIFIER_URL = os.getenv("NOTIFIER_URL", "http://notifier:8500/notify")
