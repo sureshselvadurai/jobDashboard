@@ -17,6 +17,7 @@ jobs:
   test-and-push:
     name: Test & Push to ECR
     runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - name: ✅ Checkout Code
