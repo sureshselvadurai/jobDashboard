@@ -4,6 +4,7 @@ const NOTIFIER_HEALTH_URL = window.env?.NOTIFIER_URL;
 const jobsTableBody = document.getElementById("jobs-table-body");
 const searchInput = document.getElementById("search-input");
 
+
 // Initial state for filters
 let filters = { applied: null, favourite: null, search: "" };
 

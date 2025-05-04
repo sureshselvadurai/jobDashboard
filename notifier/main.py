@@ -11,6 +11,7 @@ SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+
 origins = [
     "http://app.sureshraja.live",
     "http://qa.app.sureshraja.live",
