@@ -5,17 +5,13 @@ services:
     image: mysql:latest
     container_name: job_db
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: jobs
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+    env_file: .env
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uuser", "-ppassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
       interval: 10s
       retries: 5
       start_period: 20s
@@ -30,12 +26,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      DB_USER: user
-      DB_PASSWORD: password
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_NAME: jobs
+    env_file: .env
     ports:
       - "8000:8000"
     volumes:
@@ -60,10 +51,9 @@ services:
       dockerfile: Dockerfile
     container_name: job_notifier
     restart: always
+    env_file: .env
     ports:
       - "8500:8500"
-    environment:
-      SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
     volumes:
       - ./notifier:/app
     healthcheck:
