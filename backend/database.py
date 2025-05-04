@@ -43,6 +43,7 @@ def wait_for_db(engine, retries=10, delay=3):
             time.sleep(delay)
     raise RuntimeError("❌ Database not ready after retries.")
 
+
 def init_db():
     print("Database User:", Config.DB_USER)
     wait_for_db(engine)

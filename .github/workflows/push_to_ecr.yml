@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: ✅ Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # Needed for diffing with previous commit
 
       - name: 🔐 Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -39,8 +41,21 @@ jobs:
       - name: ⚙️ Create .env file
         run: |
           cat <<EOF > .env
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_NAME=${{ secrets.DB_NAME }}
           SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }}
           EOF
+
+      - name: 🕵️ Detect Changed Services
+        id: changes
+        run: |
+          git diff --name-only HEAD^ HEAD > changed.txt
+          echo "CHANGED_BACKEND=$(grep '^backend/' changed.txt || true)" >> $GITHUB_ENV
+          echo "CHANGED_FRONTEND=$(grep '^frontend/' changed.txt || true)" >> $GITHUB_ENV
+          echo "CHANGED_NOTIFIER=$(grep '^notifier/' changed.txt || true)" >> $GITHUB_ENV
 
       - name: 🐳 Start Docker Compose
         run: |
@@ -53,6 +68,7 @@ jobs:
           docker exec job_backend cat /tmp/result.json
 
       - name: 🚀 Build & Push Backend Image
+        if: env.CHANGED_BACKEND != ''
         run: |
           docker build \
             --build-arg DB_USER=${{ secrets.DB_USER }} \
@@ -64,11 +80,13 @@ jobs:
           docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:latest
 
       - name: 🚀 Build & Push Frontend Image
+        if: env.CHANGED_FRONTEND != ''
         run: |
           docker build -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-frontend:latest frontend
           docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-frontend:latest
 
       - name: 🚀 Build & Push Notifier Image
+        if: env.CHANGED_NOTIFIER != ''
         run: |
           docker build \
             --build-arg SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }} \
