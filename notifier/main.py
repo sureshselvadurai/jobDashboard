@@ -10,6 +10,22 @@ SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+origins = [
+    "http://app.sureshraja.live",
+    "http://qa.app.sureshraja.live",
+    "http://dev.app.sureshraja.live",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/health")
 def health():
     return {"status": "ok", "color" : "green"}

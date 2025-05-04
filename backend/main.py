@@ -19,8 +19,10 @@ logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(redirect_slashes=False)
 origins = [
-    "http://dev.app.sureshraja.live",
     Config.FRONTEND_URL,
+    "http://app.sureshraja.live",
+    "http://qa.app.sureshraja.live",
+    "http://dev.app.sureshraja.live",
     "http://localhost:5500",
     "http://127.0.0.1:5500",
 ]
