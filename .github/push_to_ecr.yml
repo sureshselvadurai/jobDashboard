@@ -1,0 +1,80 @@
+name: Push to ECR on Merge
+
+on:
+  push:
+    branches:
+      - dev
+      - qa
+      - prod
+    paths-ignore:
+      - '**.md'
+
+env:
+  REGION: us-east-1
+  REPO_NAME: jobDashboard
+
+jobs:
+  test-and-push:
+    name: Test & Push to ECR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ Checkout Code
+        uses: actions/checkout@v3
+
+      - name: 🔐 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.REGION }}
+
+      - name: 🔑 Login to ECR
+        run: |
+          aws ecr get-login-password --region $REGION | \
+          docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+      - name: ⚙️ Create .env file
+        run: |
+          cat <<EOF > .env
+          DB_USER=${{ secrets.DB_USER }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }}
+          EOF
+
+      - name: 🐳 Start Docker Compose
+        run: |
+          docker compose --env-file .env up -d
+          sleep 30
+
+      - name: 🔍 Call /notify/refresh-and-notify
+        run: |
+          docker exec job_backend curl http://localhost:8000/notify/refresh-and-notify -o /tmp/result.json
+          docker exec job_backend cat /tmp/result.json
+
+      - name: 🚀 Build & Push Backend Image
+        run: |
+          docker build \
+            --build-arg DB_USER=${{ secrets.DB_USER }} \
+            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            --build-arg DB_HOST=${{ secrets.DB_HOST }} \
+            --build-arg DB_PORT=${{ secrets.DB_PORT }} \
+            --build-arg DB_NAME=${{ secrets.DB_NAME }} \
+            -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:latest backend
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:latest
+
+      - name: 🚀 Build & Push Frontend Image
+        run: |
+          docker build -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-frontend:latest frontend
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-frontend:latest
+
+      - name: 🚀 Build & Push Notifier Image
+        run: |
+          docker build \
+            --build-arg SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }} \
+            -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-notifier:latest notifier
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-notifier:latest
