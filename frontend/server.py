@@ -9,6 +9,6 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
 # Start HTTP server
-with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
-    print(f"Serving frontend at http://localhost:{PORT}")
+with socketserver.TCPServer(("0.0.0.0", PORT), CustomHandler) as httpd:
+    print(f"Serving frontend at http://0.0.0.0:{PORT}")
     httpd.serve_forever()
