@@ -46,11 +46,18 @@ jobs:
 
       - name: 🕵️ Detect Changed Services
         id: changes
+        shell: bash
         run: |
           git diff --name-only HEAD^ HEAD > changed.txt
-          echo "CHANGED_BACKEND=$(grep '^backend/' changed.txt || true)" >> $GITHUB_ENV
-          echo "CHANGED_FRONTEND=$(grep '^frontend/' changed.txt || true)" >> $GITHUB_ENV
-          echo "CHANGED_NOTIFIER=$(grep '^notifier/' changed.txt || true)" >> $GITHUB_ENV
+
+          CHANGED_BACKEND=$(grep '^backend/' changed.txt || true)
+          CHANGED_FRONTEND=$(grep '^frontend/' changed.txt || true)
+          CHANGED_NOTIFIER=$(grep '^notifier/' changed.txt || true)
+
+          # Export as environment variables for later steps
+          echo "CHANGED_BACKEND=${CHANGED_BACKEND}" >> "$GITHUB_ENV"
+          echo "CHANGED_FRONTEND=${CHANGED_FRONTEND}" >> "$GITHUB_ENV"
+          echo "CHANGED_NOTIFIER=${CHANGED_NOTIFIER}" >> "$GITHUB_ENV"
 
       - name: 🐳 Start Docker Compose
         run: |
