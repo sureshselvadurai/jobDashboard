@@ -1,6 +1,5 @@
-const API_URL = window.location.hostname === "localhost"
-    ? "http://localhost:8000/jobs/"
-    : "https://api.sureshraja.live/jobs/";
+const BACKEND_HEALTH_URL = window.env?.BACKEND_URL;
+const NOTIFIER_HEALTH_URL = window.env?.NOTIFIER_URL;
 
 const jobsTableBody = document.getElementById("jobs-table-body");
 const searchInput = document.getElementById("search-input");
@@ -16,7 +15,7 @@ async function  fetchJobs() {
         if (filters.favourite !== null) params.append("favourite", filters.favourite);
         if (filters.search) params.append("search", filters.search);
 
-        const response = await fetch(`${API_URL}?${params}`);
+        const response = await fetch(`${BACKEND_HEALTH_URL}/jobs/?${params}`);
         const jobs = await response.json();
         displayJobs(jobs);
     } catch (error) {
@@ -56,7 +55,7 @@ function displayJobs(jobs) {
 // Function to mark job as applied
 async function markAsApplied(jobId) {
     try {
-        await fetch(`${API_URL}${jobId}/apply`, { method: "PUT" });
+        await fetch(`${BACKEND_HEALTH_URL}/jobs/${jobId}/apply`, { method: "PUT" });
         fetchJobs();
     } catch (error) {
         console.error("Error marking job as applied:", error);
@@ -66,7 +65,7 @@ async function markAsApplied(jobId) {
 // Function to toggle favourite status
 async function toggleFavourite(jobId) {
     try {
-        await fetch(`${API_URL}${jobId}/favourite`, { method: "PUT" });
+        await fetch(`${BACKEND_HEALTH_URL}/jobs/${jobId}/favourite`, { method: "PUT" });
         fetchJobs();
     } catch (error) {
         console.error("Error toggling favourite:", error);
@@ -101,3 +100,47 @@ searchInput.addEventListener("keypress", (event) => {
 
 // Fetch jobs when the page loads
 fetchJobs();
+
+function updateHealthDot(dotId, color) {
+  const dot = document.getElementById(dotId);
+  if (!dot) return;
+  dot.style.backgroundColor = color;
+}
+
+async function pingHealthEndpoints() {
+  try {
+    const backendRes = await fetch(`${BACKEND_HEALTH_URL}/health`);
+    const backendStatus = await backendRes.json();
+    updateHealthDot("backend-dot", backendStatus.color);
+  } catch {
+    updateHealthDot("backend-dot", "fail");
+  }
+
+  try {
+    const notifierRes = await fetch(`${BACKEND_HEALTH_URL}/health`);
+    const notifierStatus = await notifierRes.json();
+    updateHealthDot("notifier-dot", notifierStatus.color);
+  } catch {
+    updateHealthDot("notifier-dot", "fail");
+  }
+}
+
+// Ping every 5 seconds
+pingHealthEndpoints();
+setInterval(pingHealthEndpoints, 5000);
+
+
+document.getElementById("notify-slack").addEventListener("click", async () => {
+  const notifyUrl = window.location.hostname === "localhost"
+    ? "http://localhost:8000/notify/refresh-and-notify"
+    : (window.env?.BACKEND_URL?.replace(/\/$/, "") || "") + "/notify/refresh-and-notify";
+
+  try {
+    const res = await fetch(notifyUrl);
+    const data = await res.json();
+    alert(data.message || "Slack notified!");
+  } catch (error) {
+    console.error("Error notifying Slack:", error);
+    alert("❌ Failed to notify Slack.");
+  }
+});

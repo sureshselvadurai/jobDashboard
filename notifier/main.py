@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "color" : "green"}
 
 
 @app.post("/notify")

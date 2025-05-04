@@ -12,7 +12,7 @@ class Config:
     DB_NAME = os.getenv("DB_NAME") or "jdatabase"
 
     NOTIFIER_URL = os.getenv("NOTIFIER_URL") or "http://notifier:8500/notify"
-
+    FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://frontend:5500/notify"
 
 print("🔧 Loaded DB Config:")
 print(f"  Host: {Config.DB_HOST}")

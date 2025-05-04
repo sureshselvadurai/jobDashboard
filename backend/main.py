@@ -1,44 +1,42 @@
-import os
-import threading
-import time
-from contextlib import asynccontextmanager
+import logging
 from datetime import datetime, timedelta, date
 from typing import List
 
 import pandas as pd
 import requests
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from jobspy import scrape_jobs
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 
+from conf import Config
 from database import JobListing, get_db
 from models import JobListingResponse
-from conf import Config
-import os
-import requests
-import logging
-from fastapi.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(redirect_slashes=False)
+origins = [
+    Config.FRONTEND_URL,
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
 from sqlalchemy import or_
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
+    return {"status": "ok", "timestamp": datetime.utcnow().isoformat(), "color" : "green"}
 
 @app.get("/routes")
 def list_routes():

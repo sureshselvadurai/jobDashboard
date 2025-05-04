@@ -52,7 +52,7 @@ except Exception as e:
 engine = create_engine(db_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-def wait_for_db(engine, retries=10, delay=3):
+def wait_for_db(engine, retries=2, delay=3):
     for attempt in range(retries):
         try:
             with engine.connect():
