@@ -85,8 +85,8 @@ jobs:
         if: env.CHANGED_BACKEND == 'true'
         run: |
           docker build \
-            -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:v1.1.0 backend
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:v1.1.0
+            -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:latest backend
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:latest
 
       - name: 🚀 Build & Push Frontend Image
         if: env.CHANGED_FRONTEND == 'true'
