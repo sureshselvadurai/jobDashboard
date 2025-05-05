@@ -41,7 +41,7 @@ from sqlalchemy import or_
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "timestamp": datetime.utcnow().isoformat(), "color" : "black"}
+    return {"status": "ok", "timestamp": datetime.utcnow().isoformat(), "color" : "red"}
 
 @app.get("/routes")
 def list_routes():
