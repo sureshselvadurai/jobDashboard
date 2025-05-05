@@ -85,13 +85,8 @@ jobs:
         if: env.CHANGED_BACKEND == 'true'
         run: |
           docker build \
-            --build-arg DB_USER=${{ secrets.DB_USER }} \
-            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            --build-arg DB_HOST=${{ secrets.DB_HOST }} \
-            --build-arg DB_PORT=${{ secrets.DB_PORT }} \
-            --build-arg DB_NAME=${{ secrets.DB_NAME }} \
-            -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:latest backend
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:latest
+            -t ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:v1.1.0 backend
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ github.ref_name }}/job-backend:v1.1.0
 
       - name: 🚀 Build & Push Frontend Image
         if: env.CHANGED_FRONTEND == 'true'

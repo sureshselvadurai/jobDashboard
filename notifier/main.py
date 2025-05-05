@@ -18,11 +18,14 @@ origins = [
     "http://dev.app.sureshraja.live",
     "http://localhost:5500",
     "http://127.0.0.1:5500",
+    "http://frontend:5500",
+    "http://0.0.0.0:5500",
+    "http://0.0.0.0:5500/"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -33,7 +36,7 @@ def health():
     return {"status": "ok", "color" : "green"}
 
 
-@app.post("/notify")
+@app.get("/notify")
 async def post_to_slack(request: Request):
 
     try:
