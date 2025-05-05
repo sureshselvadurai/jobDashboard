@@ -25,11 +25,13 @@ origins = [
     "http://dev.app.sureshraja.live",
     "http://localhost:5500",
     "http://127.0.0.1:5500",
+    "http://frontend:5500",
+    "http://0.0.0.0:5500",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -39,7 +41,7 @@ from sqlalchemy import or_
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "timestamp": datetime.utcnow().isoformat(), "color" : "green"}
+    return {"status": "ok", "timestamp": datetime.utcnow().isoformat(), "color" : "black"}
 
 @app.get("/routes")
 def list_routes():
@@ -182,8 +184,8 @@ def refresh_jobs(db: Session = Depends(get_db)):
 
         # 4. Send to notifier
         try:
-            logger.info(f"📨 Sending Slack message to {Config.NOTIFIER_URL}")
-            res = requests.post(Config.NOTIFIER_URL, json={"text": message})
+            logger.info(f"📨 Sending Slack message to {Config.NOTIFIER_URL}/notify")
+            res = requests.get(f"{Config.NOTIFIER_URL}/notify", json={"text": message})
             if res.status_code != 200:
                 logger.error(f"❌ Slack response: {res.status_code}, {res.text}")
                 return JSONResponse(status_code=500, content={"error": "Slack webhook failed"})
@@ -227,8 +229,8 @@ def refresh_and_notify(db: Session = Depends(get_db)):
 
     # 4. Send to notifier
     try:
-        logger.info(f"📨 Sending Slack message to {Config.NOTIFIER_URL}")
-        res = requests.post(Config.NOTIFIER_URL, json={"text": message})
+        logger.info(f"📨 Sending Slack message to {Config.NOTIFIER_URL}/notify")
+        res = requests.get(f"{Config.NOTIFIER_URL}/notify", json={"text": message})
         if res.status_code != 200:
             logger.error(f"❌ Slack response: {res.status_code}, {res.text}")
             return JSONResponse(status_code=500, content={"error": "Slack webhook failed"})

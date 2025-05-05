@@ -12,8 +12,8 @@ class Config:
     DB_PORT = int(os.getenv("DB_PORT") or 3306)
     DB_NAME = os.getenv("DB_NAME") or "jdatabase"
 
-    NOTIFIER_URL = os.getenv("NOTIFIER_URL") or "http://notifier:8500/notify"
-    FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://frontend:5500/notify"
+    NOTIFIER_URL = os.getenv("NOTIFIER_URL") or "http://notifier:8500"
+    FRONTEND_URL = os.getenv("FRONTEND_URL") or "http://frontend:5500"
 
 print("🔧 Loaded DB Config:")
 
