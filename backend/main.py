@@ -48,6 +48,7 @@ def health_check():
 
 @app.get("/routes")
 def list_routes():
+
     return [route.path for route in app.routes]
 
 @app.get("/jobs/", response_model=List[JobListingResponse])
