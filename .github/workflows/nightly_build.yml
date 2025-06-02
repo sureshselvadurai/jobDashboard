@@ -18,6 +18,7 @@ jobs:
   build-and-test:
     name: 🛠️ Local Docker Compose Build & API Check
     runs-on: ubuntu-latest
+    environment: prod
 
     steps:
       - name: ✅ Checkout Code
