@@ -1,0 +1,55 @@
+name: Local Build & API Check
+
+on:
+  push:
+    branches:
+      - prod
+    paths-ignore:
+      - '**.md'
+
+  schedule:
+    - cron: '0 5 * * *'  # Runs at 5:00 AM UTC daily
+
+env:
+  API_RETRY_COUNT: 10
+  API_RETRY_DELAY: 3
+
+jobs:
+  build-and-test:
+    name: 🛠️ Local Docker Compose Build & API Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ Checkout Code
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Create .env file
+        run: |
+          cat <<EOF > .env
+          SLACK_WEBHOOK_URL=${{ secrets.SLACK_WEBHOOK_URL }}
+          EOF
+
+      - name: 🐳 Start Docker Compose
+        run: |
+          docker compose --env-file .env up -d --build
+          sleep 30  # wait for services to stabilize
+
+      - name: 🔍 Call refresh-and-notify API
+        run: |
+          for i in $(seq 1 $API_RETRY_COUNT); do
+            echo "Attempt $i: checking backend..."
+            if docker exec job_backend curl -s http://0.0.0.0:8000/notify/refresh-and-notify -o /tmp/result.json; then
+              echo "✅ Backend responded."
+              docker exec job_backend cat /tmp/result.json
+              exit 0
+            else
+              echo "❌ Backend not ready, retrying in $API_RETRY_DELAY seconds..."
+              sleep $API_RETRY_DELAY
+            fi
+          done
+          echo "❌ Backend did not respond after $API_RETRY_COUNT retries."
+          exit 1
+
+      - name: 🧹 Tear down Docker Compose
+        if: always()
+        run: docker compose down
