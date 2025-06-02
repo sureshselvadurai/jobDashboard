@@ -214,24 +214,45 @@ def refresh_and_notify(db: Session = Depends(get_db)):
         logger.error(f"❌ Failed to refresh jobs: {e}")
         return JSONResponse(status_code=500, content={"error": "Failed to refresh jobs"})
 
-    # 2. Get latest 10 jobs
     try:
-        jobs = get_jobs(db=db)
-        top_jobs = jobs[:10]
-        logger.info(f"📋 Retrieved {len(top_jobs)} jobs")
+        # 2. Get top 10 latest jobs
+        top_jobs = (
+            db.query(JobListing)
+            .order_by(JobListing.date_posted.desc())
+            .limit(10)
+            .all()
+        )
+
+        # 3. Get top 10 machine learning jobs by title search
+        ml_jobs = (
+            db.query(JobListing)
+            .filter(JobListing.title.ilike("%machine learning%"))
+            .order_by(JobListing.date_posted.desc())
+            .limit(10)
+            .all()
+        )
+
+        logger.info(f"📋 Retrieved {len(top_jobs)} latest jobs and {len(ml_jobs)} ML jobs")
     except Exception as e:
         logger.error(f"❌ Failed to fetch jobs: {e}")
         return JSONResponse(status_code=500, content={"error": "Failed to fetch jobs"})
 
-    # 3. Format Slack message
+    # 4. Format Slack message
     message = "*🆕 Top 10 Latest Jobs*\n"
     if not top_jobs:
-        message += "No jobs available."
+        message += "No jobs available.\n"
     else:
         for idx, job in enumerate(top_jobs, 1):
             message += f"\n{idx}. *{job.title}* at *{job.company}*\n<{job.job_url}|View Job>"
 
-    # 4. Send to notifier
+    message += "\n\n*🤖 Top 10 Machine Learning Jobs*\n"
+    if not ml_jobs:
+        message += "No ML jobs available."
+    else:
+        for idx, job in enumerate(ml_jobs, 1):
+            message += f"\n{idx}. *{job.title}* at *{job.company}*\n<{job.job_url}|View Job>"
+
+    # 5. Send to notifier
     try:
         logger.info(f"📨 Sending Slack message to {Config.NOTIFIER_URL}/notify")
         res = requests.get(f"{Config.NOTIFIER_URL}/notify", json={"text": message})
